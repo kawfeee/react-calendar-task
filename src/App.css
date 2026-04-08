@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Boldonse&display=swap');
+
 .scene {
   min-height: 100vh;
   display: grid;
@@ -40,36 +42,58 @@
   border-bottom-left-radius: 46px 30px;
   border-bottom-right-radius: 46px 30px;
   transform-origin: center center;
-  transition: transform 0.34s ease, opacity 0.34s ease;
+  transition: transform 0.32s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.32s ease;
   backface-visibility: hidden;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+.photo-panel.entry-intro {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.photo-panel.entry-visible:not(.is-flipping) {
+  opacity: 1;
+  transform: scale(1);
+  transition: transform 620ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 520ms ease-out;
 }
 
 .photo-panel.is-flipping {
-  opacity: 0.6;
+  opacity: 0.82;
+}
+
+.photo-panel.is-flipping.out {
+  z-index: 3;
+}
+
+.photo-panel.is-flipping.in-start,
+.photo-panel.is-flipping.in-active {
+  z-index: 2;
 }
 
 .photo-panel.is-flipping.out.next {
-  transform: translateX(-110%);
+  transform: translateX(-56%);
 }
 
 .photo-panel.is-flipping.out.prev {
-  transform: translateX(110%);
+  transform: translateX(56%);
 }
 
 .photo-panel.is-flipping.in-start.next {
   transition: none;
-  transform: translateX(110%);
-  opacity: 0.6;
+  transform: translateX(56%);
+  opacity: 0.74;
 }
 
 .photo-panel.is-flipping.in-start.prev {
   transition: none;
-  transform: translateX(-110%);
-  opacity: 0.6;
+  transform: translateX(-56%);
+  opacity: 0.74;
 }
 
 .photo-panel.is-flipping.in-active {
-  transition: transform 0.34s ease, opacity 0.34s ease;
+  transition: transform 0.32s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.32s ease;
   transform: translateX(0);
   opacity: 1;
 }
@@ -110,37 +134,59 @@
   gap: 20px;
   padding: 20px 18px 18px;
   transform-origin: center center;
-  transition: transform 0.34s ease, opacity 0.34s ease;
+  transition: transform 0.32s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.32s ease;
   backface-visibility: hidden;
   position: relative;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+.calendar-content.entry-intro {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.calendar-content.entry-visible:not(.is-flipping) {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1) 160ms, opacity 520ms ease-out 160ms;
 }
 
 .calendar-content.is-flipping {
-  opacity: 0.6;
+  opacity: 0.82;
+}
+
+.calendar-content.is-flipping.out {
+  z-index: 3;
+}
+
+.calendar-content.is-flipping.in-start,
+.calendar-content.is-flipping.in-active {
+  z-index: 2;
 }
 
 .calendar-content.is-flipping.out.next {
-  transform: translateX(-110%);
+  transform: translateX(-56%);
 }
 
 .calendar-content.is-flipping.out.prev {
-  transform: translateX(110%);
+  transform: translateX(56%);
 }
 
 .calendar-content.is-flipping.in-start.next {
   transition: none;
-  transform: translateX(110%);
-  opacity: 0.6;
+  transform: translateX(56%);
+  opacity: 0.74;
 }
 
 .calendar-content.is-flipping.in-start.prev {
   transition: none;
-  transform: translateX(-110%);
-  opacity: 0.6;
+  transform: translateX(-56%);
+  opacity: 0.74;
 }
 
 .calendar-content.is-flipping.in-active {
-  transition: transform 0.34s ease, opacity 0.34s ease;
+  transition: transform 0.32s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.32s ease;
   transform: translateX(0);
   opacity: 1;
 }
@@ -148,7 +194,8 @@
 .notes-panel h2 {
   margin: 0 0 8px;
   font-size: 11px;
-  font-weight: 700;
+  font-family: 'Boldonse', sans-serif;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #73777f;
@@ -162,9 +209,9 @@
   background: repeating-linear-gradient(
     to bottom,
     #ffffff 0,
-    #ffffff 23px,
-    #e8edf3 23px,
-    #e8edf3 24px
+    #ffffff 22px,
+    #ced9e4 22px,
+    #ced9e4 24px
   );
   padding: 6px 8px;
   line-height: 24px;
@@ -180,8 +227,8 @@
 }
 
 .notes-input:focus {
-  outline: 2px solid rgba(30, 156, 226, 0.35);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: none;
 }
 
 .dates-panel {
@@ -206,14 +253,16 @@
 .month-title p {
   margin: 0;
   font-size: 32px;
-  font-weight: 300;
-  color: #f3f6fa;
+  font-family: 'Boldonse', sans-serif;
+  font-weight: 400;
+  color: #d2d5d9;
 }
 
 .month-title h1 {
   margin: 2px 0 0;
   font-size: 29px;
-  font-weight: 800;
+  font-family: 'Boldonse', sans-serif;
+  font-weight: 400;
   letter-spacing: 0.03em;
   color: #1e9ce2;
 }
@@ -226,8 +275,9 @@
 }
 
 .weekdays {
+  font-family: 'Boldonse', sans-serif;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   color: #7c8895;
 }
@@ -245,6 +295,7 @@
 }
 
 .day {
+  position: relative;
   border: 0;
   width: 100%;
   min-height: 30px;
@@ -257,12 +308,16 @@
   align-items: center;
   justify-content: center;
   transform: translateZ(0);
-  transition: background-color 220ms ease, color 220ms ease, transform 140ms ease;
+  transition: background-color 180ms ease-in-out, color 180ms ease-in-out, transform 180ms ease-in-out,
+    border-radius 180ms ease-in-out;
   will-change: transform, background-color;
 }
 
-.day:hover {
-  background: #e6f2fa;
+.day:not(.range-in):not(.range-start):not(.range-end):hover {
+  background: rgba(30, 156, 226, 0.14);
+  border-radius: 14px;
+  transform: translateZ(0) scale(1.06);
+  z-index: 1;
 }
 
 .day:active {
@@ -285,16 +340,50 @@
 
 .day.range-in {
   border-radius: 0;
-  background: linear-gradient(90deg, #e8f3fb 0%, #e1f0fb 100%);
   color: #187fb8;
-  animation: rangeReveal 220ms ease-out;
 }
 
 .day.range-start,
 .day.range-end {
-  background: linear-gradient(90deg, #2ca6ea 0%, #1993d8 100%);
   color: #ffffff;
-  animation: rangeReveal 220ms ease-out;
+}
+
+.day.range-in,
+.day.range-start,
+.day.range-end {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: transparent;
+}
+
+.day.range-in::before,
+.day.range-start::before,
+.day.range-end::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.day.range-in::before {
+  background: linear-gradient(90deg, #e8f3fb 0%, #e1f0fb 100%);
+}
+
+.day.range-start::before,
+.day.range-end::before {
+  background: linear-gradient(90deg, #2ca6ea 0%, #1993d8 100%);
+}
+
+.day.range-animating::before {
+  animation: rangeExpand 340ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+  animation-delay: var(--range-delay, 0ms);
+}
+
+.day.range-backward.range-animating::before {
+  transform-origin: right center;
 }
 
 .day.range-start {
@@ -315,6 +404,20 @@
   border-radius: 999px;
 }
 
+.day.range-start::before {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.day.range-end::before {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+.day.range-start.range-end::before {
+  border-radius: 999px;
+}
+
 @keyframes rangeReveal {
   from {
     opacity: 0.6;
@@ -322,6 +425,15 @@
   }
   to {
     opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rangeExpand {
+  from {
+    transform: scaleX(0);
+  }
+  to {
     transform: scaleX(1);
   }
 }

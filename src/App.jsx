@@ -1,7 +1,9 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 function App() {
+  const flipDurationMs = 320
+  const settleDurationMs = 640
   const year = 2022
   const monthNames = [
     'January',
@@ -24,8 +26,13 @@ function App() {
   const [transitionPhase, setTransitionPhase] = useState('idle')
   const [rangeStart, setRangeStart] = useState(null)
   const [rangeEnd, setRangeEnd] = useState(null)
+  const [rangeDirection, setRangeDirection] = useState('forward')
+  const [isRangeAnimating, setIsRangeAnimating] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
   const swipeStartX = useRef(null)
   const isSwiping = useRef(false)
+  const rangeAnimationTimer = useRef(null)
+  const entryAnimationFrame = useRef(null)
   const fallbackPhoto =
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80'
 
@@ -71,20 +78,61 @@ function App() {
     if (rangeStart === null || rangeEnd !== null) {
       setRangeStart(dateTime)
       setRangeEnd(null)
+      setIsRangeAnimating(false)
       return
     }
 
     if (dateTime < rangeStart) {
+      setRangeDirection('backward')
       setRangeEnd(rangeStart)
       setRangeStart(dateTime)
+      setIsRangeAnimating(true)
       return
     }
 
+    setRangeDirection('forward')
     setRangeEnd(dateTime)
+    setIsRangeAnimating(true)
   }
+
+  useEffect(() => {
+    entryAnimationFrame.current = requestAnimationFrame(() => {
+      setHasEntered(true)
+    })
+
+    return () => {
+      if (entryAnimationFrame.current) {
+        cancelAnimationFrame(entryAnimationFrame.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isRangeAnimating) {
+      return
+    }
+
+    if (rangeAnimationTimer.current) {
+      clearTimeout(rangeAnimationTimer.current)
+    }
+
+    rangeAnimationTimer.current = setTimeout(() => {
+      setIsRangeAnimating(false)
+    }, 420)
+
+    return () => {
+      if (rangeAnimationTimer.current) {
+        clearTimeout(rangeAnimationTimer.current)
+      }
+    }
+  }, [isRangeAnimating])
 
   const minRange = rangeStart !== null && rangeEnd !== null ? Math.min(rangeStart, rangeEnd) : null
   const maxRange = rangeStart !== null && rangeEnd !== null ? Math.max(rangeStart, rangeEnd) : null
+  const rangeStartIndex = rangeStart !== null ? dates.findIndex((date) => date.time === rangeStart) : -1
+  const rangeEndIndex = rangeEnd !== null ? dates.findIndex((date) => date.time === rangeEnd) : -1
+  const rangeSpan =
+    rangeStartIndex >= 0 && rangeEndIndex >= 0 ? Math.max(1, Math.abs(rangeEndIndex - rangeStartIndex) + 1) : 1
 
   const handleMonthFlip = (direction) => {
     if (isFlipping) {
@@ -110,12 +158,12 @@ function App() {
           setTransitionPhase('in-active')
         })
       })
-    }, 340)
+    }, flipDurationMs)
 
     setTimeout(() => {
       setIsFlipping(false)
       setTransitionPhase('idle')
-    }, 700)
+    }, settleDurationMs)
   }
 
   const startSwipe = (clientX) => {
@@ -185,6 +233,7 @@ function App() {
   }
 
   const flipClass = isFlipping ? `is-flipping ${transitionPhase} ${flipDirection}` : ''
+  const entryClass = hasEntered ? 'entry-visible' : 'entry-intro'
 
   return (
     <main className="scene" onClick={handleSceneClick}>
@@ -198,7 +247,7 @@ function App() {
         onPointerCancel={handlePointerCancel}
       >
         <header
-          className={`photo-panel ${flipClass}`}
+          className={`photo-panel ${flipClass} ${entryClass}`}
           aria-hidden="true"
           style={{
             backgroundImage: `linear-gradient(rgba(72, 95, 122, 0.24), rgba(40, 47, 58, 0.2)), url(${currentMonthPhoto})`,
@@ -208,13 +257,12 @@ function App() {
           <div className="cut-layer cut-right" />
         </header>
 
-        <section className={`calendar-content ${flipClass}`}>
+        <section className={`calendar-content ${flipClass} ${entryClass}`}>
           <aside className="notes-panel" aria-label="Notes section">
             <h2>Notes</h2>
             <textarea
               className="notes-input"
               rows="8"
-              placeholder="Write your notes here..."
               onPointerDown={(event) => event.stopPropagation()}
               onTouchStart={(event) => event.stopPropagation()}
             />
@@ -238,11 +286,21 @@ function App() {
                 const isStart = rangeStart === date.time
                 const isEnd = rangeEnd === date.time
                 const isInRange = minRange !== null && maxRange !== null && date.time > minRange && date.time < maxRange
+                const isSelectedRangeCell = isStart || isEnd || isInRange
+
+                const rangeOrder =
+                  rangeDirection === 'forward'
+                    ? Math.max(0, index - rangeStartIndex)
+                    : Math.max(0, rangeEndIndex - index)
+
+                const rangeDelayMs = (rangeOrder / rangeSpan) * 160
 
                 const rangeClass = [
                   isStart ? 'range-start' : '',
                   isEnd ? 'range-end' : '',
                   isInRange ? 'range-in' : '',
+                  isRangeAnimating && isSelectedRangeCell ? 'range-animating' : '',
+                  isSelectedRangeCell ? `range-${rangeDirection}` : '',
                 ]
                   .filter(Boolean)
                   .join(' ')
@@ -254,6 +312,13 @@ function App() {
                     className={`day ${date.type} ${rangeClass}`.trim()}
                     onClick={() => handleDateClick(date.time)}
                     aria-label={`Select ${date.day} as range date`}
+                    style={
+                      isSelectedRangeCell
+                        ? {
+                            '--range-delay': `${rangeDelayMs}ms`,
+                          }
+                        : undefined
+                    }
                   >
                     {date.day}
                   </button>
