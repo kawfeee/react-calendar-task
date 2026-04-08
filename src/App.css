@@ -454,6 +454,14 @@
     grid-template-columns: 1fr;
   }
 
+  .dates-panel {
+    order: 1;
+  }
+
+  .notes-panel {
+    order: 2;
+  }
+
   .month-title {
     text-align: left;
   }
